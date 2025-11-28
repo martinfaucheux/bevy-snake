@@ -4,6 +4,7 @@ mod core;
 mod plugins;
 
 use core::*;
+use plugins::*;
 
 use crate::plugins::ControlPlugin;
 
@@ -26,14 +27,7 @@ fn main() {
             }),
             ..default()
         }))
-        .add_plugins(ControlPlugin)
-        .insert_resource(GameTickTimer(Timer::from_seconds(
-            TICK_DURATION,
-            TimerMode::Repeating,
-        )))
-        .insert_resource(SnakeHeadDirection {
-            direction: Direction::Down,
-        })
+        .add_plugins((SharedPlugin, ControlPlugin))
         .insert_resource(ClearColor(BACKGROUND_COLOR))
         .add_systems(Startup, setup)
         .add_systems(Update, move_snake)
@@ -45,9 +39,6 @@ struct SnakeHead;
 
 #[derive(Component)]
 struct GridPosition(IVec2);
-
-#[derive(Resource)]
-struct GameTickTimer(Timer);
 
 fn setup(
     mut commands: Commands,
