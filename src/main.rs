@@ -4,7 +4,8 @@ mod core;
 mod plugins;
 
 use core::*;
-use plugins::*;
+
+use crate::plugins::ControlPlugin;
 
 const BACKGROUND_COLOR: Color = Color::srgb(0.9, 0.9, 0.9);
 const CELL_COLOR: Color = Color::srgb(0.85, 0.85, 0.85);
@@ -25,6 +26,7 @@ fn main() {
             }),
             ..default()
         }))
+        .add_plugins(ControlPlugin)
         .insert_resource(GameTickTimer(Timer::from_seconds(
             TICK_DURATION,
             TimerMode::Repeating,
@@ -34,7 +36,7 @@ fn main() {
         })
         .insert_resource(ClearColor(BACKGROUND_COLOR))
         .add_systems(Startup, setup)
-        .add_systems(Update, (update_direction, move_snake))
+        .add_systems(Update, move_snake)
         .run();
 }
 
@@ -90,20 +92,6 @@ fn setup(
         SnakeHead,
         GridPosition(init_grid_pos),
     ));
-}
-
-fn update_direction(
-    keyboard_input: Res<ButtonInput<KeyCode>>,
-    mut snake_head_direction: ResMut<SnakeHeadDirection>,
-) {
-    for key in keyboard_input.get_just_pressed() {
-        if let Some(new_direction) = Direction::from_key(key) {
-            // prevent reversing direction
-            if new_direction != snake_head_direction.direction.opposite() {
-                snake_head_direction.direction = new_direction;
-            }
-        }
-    }
 }
 
 fn move_snake(
