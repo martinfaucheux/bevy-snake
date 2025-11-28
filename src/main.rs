@@ -1,5 +1,8 @@
 use bevy::prelude::*;
 
+mod core;
+use core::*;
+
 const BACKGROUND_COLOR: Color = Color::srgb(0.9, 0.9, 0.9);
 const CELL_COLOR: Color = Color::srgb(0.85, 0.85, 0.85);
 
@@ -35,7 +38,7 @@ fn main() {
 struct SnakeHead;
 
 #[derive(Component)]
-struct Direction(IVec2);
+struct HeadDirection(Direction);
 
 #[derive(Component)]
 struct GridPosition(IVec2);
@@ -84,42 +87,37 @@ fn setup(
             ..default()
         },
         SnakeHead,
-        Direction(IVec2::X),
+        HeadDirection(Direction::Down),
         GridPosition(init_grid_pos),
     ));
 }
 
 fn update_direction(
     keyboard_input: Res<ButtonInput<KeyCode>>,
-    mut ball_direction: Single<&mut Direction, With<SnakeHead>>,
+    mut ball_direction: Single<&mut HeadDirection, With<SnakeHead>>,
 ) {
-    if keyboard_input.pressed(KeyCode::ArrowLeft) {
-        ball_direction.0 = IVec2::NEG_X;
-    }
-
-    if keyboard_input.pressed(KeyCode::ArrowRight) {
-        ball_direction.0 = IVec2::X;
-    }
-
-    if keyboard_input.pressed(KeyCode::ArrowUp) {
-        ball_direction.0 = IVec2::Y;
-    }
-
-    if keyboard_input.pressed(KeyCode::ArrowDown) {
-        ball_direction.0 = IVec2::NEG_Y;
+    for key in keyboard_input.get_just_pressed() {
+        if let Some(new_direction) = Direction::from_key(key) {
+            // prevent reversing direction
+            if new_direction != ball_direction.0.opposite() {
+                ball_direction.0 = new_direction;
+            }
+        }
     }
 }
 
 fn move_snake(
     time: Res<Time>,
     mut timer: ResMut<GameTickTimer>,
-    snake_query: Single<(&mut Transform, &mut GridPosition, &Direction), With<SnakeHead>>,
+    snake_query: Single<(&mut Transform, &mut GridPosition, &HeadDirection), With<SnakeHead>>,
 ) {
     if timer.0.tick(time.delta()).just_finished() {
         let (mut snake_transform, mut grid_position, snake_direction) = snake_query.into_inner();
 
-        grid_position.0 += snake_direction.0;
-        grid_position.0 %= IVec2::new(GRID_SIZE.x as i32, GRID_SIZE.y as i32);
+        grid_position.0 += snake_direction.0.to_ivec2();
+
+        // euclid remaining
+        grid_position.0 = grid_position.0.rem_euclid(GRID_SIZE);
 
         snake_transform.translation = grid_pos_to_world_pos(grid_position.0);
     }
