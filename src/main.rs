@@ -10,16 +10,29 @@ const BALL_COLOR: Color = Color::srgb(0.3, 0.3, 0.7);
 const CELL_SIZE: f32 = 50.0;
 const GRID_SIZE: Vec2 = Vec2::new(10.0, 10.0);
 
+const TICK_DURATION: f32 = 0.5;
+
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
+        .insert_resource(GameTickTimer(Timer::from_seconds(
+            TICK_DURATION,
+            TimerMode::Repeating,
+        )))
         .insert_resource(ClearColor(BACKGROUND_COLOR))
         .add_systems(Startup, setup)
+        .add_systems(Update, (update_direction, move_snake))
         .run();
 }
 
 #[derive(Component)]
 struct SnakeHead;
+
+#[derive(Component)]
+struct Direction(Vec2);
+
+#[derive(Resource)]
+struct GameTickTimer(Timer);
 
 fn setup(
     mut commands: Commands,
@@ -59,38 +72,42 @@ fn setup(
             ..default()
         },
         SnakeHead,
+        Direction(Vec2::X),
     ));
 }
 
-// fn move_ball(
-//     keyboard_input: Res<ButtonInput<KeyCode>>,
-//     mut ball_transform: Single<&mut Transform, With<SnakeHead>>,
-//     time: Res<Time>,
-// ) {
-//     let mut direction = Vec2::ZERO;
+fn update_direction(
+    keyboard_input: Res<ButtonInput<KeyCode>>,
+    mut ball_direction: Single<&mut Direction, With<SnakeHead>>,
+) {
+    if keyboard_input.pressed(KeyCode::ArrowLeft) {
+        ball_direction.0 = Vec2::NEG_X;
+    }
 
-//     if keyboard_input.pressed(KeyCode::ArrowLeft) {
-//         direction -= Vec2::X;
-//     }
+    if keyboard_input.pressed(KeyCode::ArrowRight) {
+        ball_direction.0 = Vec2::X;
+    }
 
-//     if keyboard_input.pressed(KeyCode::ArrowRight) {
-//         direction += Vec2::X;
-//     }
+    if keyboard_input.pressed(KeyCode::ArrowUp) {
+        ball_direction.0 = Vec2::Y;
+    }
 
-//     if keyboard_input.pressed(KeyCode::ArrowUp) {
-//         direction += Vec2::Y;
-//     }
+    if keyboard_input.pressed(KeyCode::ArrowDown) {
+        ball_direction.0 = Vec2::NEG_Y;
+    }
+}
 
-//     if keyboard_input.pressed(KeyCode::ArrowDown) {
-//         direction -= Vec2::Y;
-//     }
-
-//     // Calculate the new horizontal ball position based on player input
-//     let new_ball_position =
-//         ball_transform.translation + direction.extend(0.0) * BALL_SPEED * time.delta_secs();
-
-//     ball_transform.translation = new_ball_position;
-// }
+fn move_snake(
+    time: Res<Time>,
+    mut timer: ResMut<GameTickTimer>,
+    snake_query: Single<(&mut Transform, &Direction), With<SnakeHead>>,
+) {
+    if timer.0.tick(time.delta()).just_finished() {
+        let (mut snake_transform, snake_direction) = snake_query.into_inner();
+        snake_transform.translation +=
+            Vec3::new(snake_direction.0.x, snake_direction.0.y, 0.0) * CELL_SIZE;
+    }
+}
 
 fn grid_pos_to_world_pos(grid_pos: Vec2) -> Vec3 {
     Vec3::new(
