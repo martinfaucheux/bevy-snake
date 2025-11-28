@@ -31,6 +31,9 @@ struct SnakeHead;
 #[derive(Component)]
 struct Direction(IVec2);
 
+#[derive(Component)]
+struct GridPosition(IVec2);
+
 #[derive(Resource)]
 struct GameTickTimer(Timer);
 
@@ -66,15 +69,17 @@ fn setup(
     }
 
     let shape = meshes.add(Circle::new((CELL_SIZE / 2.0) * 0.8));
+    let init_grid_pos = world_pos_to_grid_pos(Vec3::ZERO);
     commands.spawn((
         Mesh2d(shape),
         MeshMaterial2d(materials.add(BALL_COLOR)),
         Transform {
-            translation: grid_pos_to_world_pos(world_pos_to_grid_pos(Vec3::ZERO)),
+            translation: grid_pos_to_world_pos(init_grid_pos),
             ..default()
         },
         SnakeHead,
         Direction(IVec2::X),
+        GridPosition(init_grid_pos),
     ));
 }
 
@@ -102,12 +107,15 @@ fn update_direction(
 fn move_snake(
     time: Res<Time>,
     mut timer: ResMut<GameTickTimer>,
-    snake_query: Single<(&mut Transform, &Direction), With<SnakeHead>>,
+    snake_query: Single<(&mut Transform, &mut GridPosition, &Direction), With<SnakeHead>>,
 ) {
     if timer.0.tick(time.delta()).just_finished() {
-        let (mut snake_transform, snake_direction) = snake_query.into_inner();
-        snake_transform.translation +=
-            Vec3::new(snake_direction.0.x as f32, snake_direction.0.y as f32, 0.0) * CELL_SIZE;
+        let (mut snake_transform, mut grid_position, snake_direction) = snake_query.into_inner();
+
+        grid_position.0 += snake_direction.0;
+        grid_position.0 %= IVec2::new(GRID_SIZE.x as i32, GRID_SIZE.y as i32);
+
+        snake_transform.translation = grid_pos_to_world_pos(grid_position.0);
     }
 }
 
