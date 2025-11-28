@@ -1,7 +1,8 @@
 use bevy::prelude::*;
 
 const BACKGROUND_COLOR: Color = Color::srgb(0.9, 0.9, 0.9);
-const SPRITE_COLOR: Color = Color::srgb(0.3, 0.3, 0.7);
+const CIRCLE_COLOR: Color = Color::srgb(0.3, 0.3, 0.7);
+const CIRCLE_SIZE: f32 = 50.0;
 
 fn main() {
     App::new()
@@ -11,15 +12,18 @@ fn main() {
         .run();
 }
 
-fn setup(mut commands: Commands) {
+fn setup(
+    mut commands: Commands,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<ColorMaterial>>,
+) {
     commands.spawn(Camera2d);
 
+    let shape = meshes.add(Circle::new(CIRCLE_SIZE));
+
     commands.spawn((
-        Sprite::from_color(SPRITE_COLOR, Vec2::ONE),
-        Transform {
-            translation: Vec3::ZERO,
-            scale: Vec3::new(100.0, 100.0, 0.0),
-            ..default()
-        },
+        Mesh2d(shape),
+        MeshMaterial2d(materials.add(CIRCLE_COLOR)),
+        Transform::default(),
     ));
 }
