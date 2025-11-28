@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use super::*;
+use super::constants::*;
 
 #[derive(Resource)]
 pub struct SnakeHeadDirection {

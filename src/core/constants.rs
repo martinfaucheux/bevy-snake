@@ -1,6 +1,15 @@
 use bevy::prelude::*;
 
 pub const TICK_DURATION: f32 = 0.5;
+pub const BACKGROUND_COLOR: Color = Color::srgb(0.9, 0.9, 0.9);
+pub const CELL_COLOR: Color = Color::srgb(0.85, 0.85, 0.85);
+
+pub const CELL_BORDER_THICKNESS: f32 = 2.0;
+
+pub const BALL_COLOR: Color = Color::srgb(0.3, 0.3, 0.7);
+
+pub const CELL_SIZE: f32 = 50.0;
+pub const GRID_SIZE: IVec2 = IVec2::new(10, 10);
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum Direction {
