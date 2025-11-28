@@ -27,7 +27,7 @@ fn main() {
             }),
             ..default()
         }))
-        .add_plugins((SharedPlugin, ControlPlugin))
+        .add_plugins((SharedPlugin, ControlPlugin, GamePlugin))
         .insert_resource(ClearColor(BACKGROUND_COLOR))
         .add_systems(Startup, setup)
         .add_systems(Update, move_snake)
