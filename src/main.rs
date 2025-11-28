@@ -8,7 +8,7 @@ const CELL_BORDER_THICKNESS: f32 = 2.0;
 const BALL_COLOR: Color = Color::srgb(0.3, 0.3, 0.7);
 
 const CELL_SIZE: f32 = 50.0;
-const GRID_SIZE: Vec2 = Vec2::new(10.0, 10.0);
+const GRID_SIZE: IVec2 = IVec2::new(10, 10);
 
 const TICK_DURATION: f32 = 0.5;
 
@@ -29,7 +29,7 @@ fn main() {
 struct SnakeHead;
 
 #[derive(Component)]
-struct Direction(Vec2);
+struct Direction(IVec2);
 
 #[derive(Resource)]
 struct GameTickTimer(Timer);
@@ -52,8 +52,10 @@ fn setup(
                 },
                 Transform {
                     translation: Vec3::new(
-                        col as f32 * CELL_SIZE - (GRID_SIZE.x * CELL_SIZE) / 2.0 + CELL_SIZE / 2.0,
-                        row as f32 * CELL_SIZE - (GRID_SIZE.y * CELL_SIZE) / 2.0 + CELL_SIZE / 2.0,
+                        col as f32 * CELL_SIZE - (GRID_SIZE.x as f32 * CELL_SIZE) / 2.0
+                            + CELL_SIZE / 2.0,
+                        row as f32 * CELL_SIZE - (GRID_SIZE.y as f32 * CELL_SIZE) / 2.0
+                            + CELL_SIZE / 2.0,
                         // in background
                         -10.0,
                     ),
@@ -68,11 +70,11 @@ fn setup(
         Mesh2d(shape),
         MeshMaterial2d(materials.add(BALL_COLOR)),
         Transform {
-            translation: grid_pos_to_world_pos(Vec2::new(GRID_SIZE.x / 2.0, GRID_SIZE.y / 2.0)),
+            translation: grid_pos_to_world_pos(world_pos_to_grid_pos(Vec3::ZERO)),
             ..default()
         },
         SnakeHead,
-        Direction(Vec2::X),
+        Direction(IVec2::X),
     ));
 }
 
@@ -81,19 +83,19 @@ fn update_direction(
     mut ball_direction: Single<&mut Direction, With<SnakeHead>>,
 ) {
     if keyboard_input.pressed(KeyCode::ArrowLeft) {
-        ball_direction.0 = Vec2::NEG_X;
+        ball_direction.0 = IVec2::NEG_X;
     }
 
     if keyboard_input.pressed(KeyCode::ArrowRight) {
-        ball_direction.0 = Vec2::X;
+        ball_direction.0 = IVec2::X;
     }
 
     if keyboard_input.pressed(KeyCode::ArrowUp) {
-        ball_direction.0 = Vec2::Y;
+        ball_direction.0 = IVec2::Y;
     }
 
     if keyboard_input.pressed(KeyCode::ArrowDown) {
-        ball_direction.0 = Vec2::NEG_Y;
+        ball_direction.0 = IVec2::NEG_Y;
     }
 }
 
@@ -105,21 +107,21 @@ fn move_snake(
     if timer.0.tick(time.delta()).just_finished() {
         let (mut snake_transform, snake_direction) = snake_query.into_inner();
         snake_transform.translation +=
-            Vec3::new(snake_direction.0.x, snake_direction.0.y, 0.0) * CELL_SIZE;
+            Vec3::new(snake_direction.0.x as f32, snake_direction.0.y as f32, 0.0) * CELL_SIZE;
     }
 }
 
-fn grid_pos_to_world_pos(grid_pos: Vec2) -> Vec3 {
+fn grid_pos_to_world_pos(grid_pos: IVec2) -> Vec3 {
     Vec3::new(
-        grid_pos.x * CELL_SIZE - (GRID_SIZE.x * CELL_SIZE) / 2.0 + CELL_SIZE / 2.0,
-        grid_pos.y * CELL_SIZE - (GRID_SIZE.y * CELL_SIZE) / 2.0 + CELL_SIZE / 2.0,
+        grid_pos.x as f32 * CELL_SIZE - (GRID_SIZE.x as f32 * CELL_SIZE) / 2.0 + CELL_SIZE / 2.0,
+        grid_pos.y as f32 * CELL_SIZE - (GRID_SIZE.y as f32 * CELL_SIZE) / 2.0 + CELL_SIZE / 2.0,
         0.0,
     )
 }
 
-fn world_pos_to_grid_pos(world_pos: Vec3) -> Vec2 {
-    Vec2::new(
-        ((world_pos.x + (GRID_SIZE.x * CELL_SIZE) / 2.0) / CELL_SIZE).floor(),
-        ((world_pos.y + (GRID_SIZE.y * CELL_SIZE) / 2.0) / CELL_SIZE).floor(),
+fn world_pos_to_grid_pos(world_pos: Vec3) -> IVec2 {
+    IVec2::new(
+        (((world_pos.x + (GRID_SIZE.x as f32 * CELL_SIZE) / 2.0) / CELL_SIZE).floor()) as i32,
+        (((world_pos.y + (GRID_SIZE.y as f32 * CELL_SIZE) / 2.0) / CELL_SIZE).floor()) as i32,
     )
 }
