@@ -1,5 +1,7 @@
 use bevy::prelude::*;
 
+pub const TICK_DURATION: f32 = 0.5;
+
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum Direction {
     Up,

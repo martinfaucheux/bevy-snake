@@ -1,7 +1,10 @@
 use bevy::prelude::*;
 
 mod core;
+mod plugins;
+
 use core::*;
+use plugins::*;
 
 const BACKGROUND_COLOR: Color = Color::srgb(0.9, 0.9, 0.9);
 const CELL_COLOR: Color = Color::srgb(0.85, 0.85, 0.85);
@@ -12,8 +15,6 @@ const BALL_COLOR: Color = Color::srgb(0.3, 0.3, 0.7);
 
 const CELL_SIZE: f32 = 50.0;
 const GRID_SIZE: IVec2 = IVec2::new(10, 10);
-
-const TICK_DURATION: f32 = 0.5;
 
 fn main() {
     App::new()
@@ -28,6 +29,9 @@ fn main() {
             TICK_DURATION,
             TimerMode::Repeating,
         )))
+        .insert_resource(SnakeHeadDirection {
+            direction: Direction::Down,
+        })
         .insert_resource(ClearColor(BACKGROUND_COLOR))
         .add_systems(Startup, setup)
         .add_systems(Update, (update_direction, move_snake))
@@ -36,9 +40,6 @@ fn main() {
 
 #[derive(Component)]
 struct SnakeHead;
-
-#[derive(Component)]
-struct HeadDirection(Direction);
 
 #[derive(Component)]
 struct GridPosition(IVec2);
@@ -87,20 +88,19 @@ fn setup(
             ..default()
         },
         SnakeHead,
-        HeadDirection(Direction::Down),
         GridPosition(init_grid_pos),
     ));
 }
 
 fn update_direction(
     keyboard_input: Res<ButtonInput<KeyCode>>,
-    mut ball_direction: Single<&mut HeadDirection, With<SnakeHead>>,
+    mut snake_head_direction: ResMut<SnakeHeadDirection>,
 ) {
     for key in keyboard_input.get_just_pressed() {
         if let Some(new_direction) = Direction::from_key(key) {
             // prevent reversing direction
-            if new_direction != ball_direction.0.opposite() {
-                ball_direction.0 = new_direction;
+            if new_direction != snake_head_direction.direction.opposite() {
+                snake_head_direction.direction = new_direction;
             }
         }
     }
@@ -109,12 +109,13 @@ fn update_direction(
 fn move_snake(
     time: Res<Time>,
     mut timer: ResMut<GameTickTimer>,
-    snake_query: Single<(&mut Transform, &mut GridPosition, &HeadDirection), With<SnakeHead>>,
+    snake_query: Single<(&mut Transform, &mut GridPosition), With<SnakeHead>>,
+    snake_head_direction: Res<SnakeHeadDirection>,
 ) {
     if timer.0.tick(time.delta()).just_finished() {
-        let (mut snake_transform, mut grid_position, snake_direction) = snake_query.into_inner();
+        let (mut snake_transform, mut grid_position) = snake_query.into_inner();
 
-        grid_position.0 += snake_direction.0.to_ivec2();
+        grid_position.0 += snake_head_direction.direction.to_ivec2();
 
         // euclid remaining
         grid_position.0 = grid_position.0.rem_euclid(GRID_SIZE);
