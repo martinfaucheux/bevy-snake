@@ -14,7 +14,13 @@ const TICK_DURATION: f32 = 0.5;
 
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins)
+        .add_plugins(DefaultPlugins.set(WindowPlugin {
+            primary_window: Some(Window {
+                title: "Rusty Snake".to_string(),
+                ..default()
+            }),
+            ..default()
+        }))
         .insert_resource(GameTickTimer(Timer::from_seconds(
             TICK_DURATION,
             TimerMode::Repeating,
