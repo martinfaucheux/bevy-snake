@@ -29,14 +29,12 @@ fn create_snake(
 }
 
 fn move_snake(
-    time: Res<Time>,
-    mut timer: ResMut<GameTickTimer>,
     snake_query: Single<(&mut Transform, &mut GridPosition), With<SnakeHead>>,
     snake_head_direction: Res<SnakeHeadDirection>,
+    mut propel_snake_message: MessageReader<PropelSnakeMessage>,
 ) {
-    if timer.0.tick(time.delta()).just_finished() {
-        let (mut snake_transform, mut grid_position) = snake_query.into_inner();
-
+    let (mut snake_transform, mut grid_position) = snake_query.into_inner();
+    for _ in propel_snake_message.read() {
         grid_position.0 += snake_head_direction.direction.to_ivec2();
 
         // euclid remaining
