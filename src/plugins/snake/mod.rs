@@ -57,18 +57,19 @@ fn move_snake(
         (&mut Transform, &mut GridPosition, &SnakeSegment),
         (With<SnakeSegment>, Without<SnakeHead>),
     >,
-    snake_head_direction: Res<SnakeHeadDirection>,
+    mut snake_head_direction: ResMut<SnakeHeadDirection>,
     mut propel_snake_message_reader: MessageReader<PropelSnakeMessage>,
 ) {
     if propel_snake_message_reader.is_empty() {
         return;
     }
     propel_snake_message_reader.clear();
+    snake_head_direction.current_direction = snake_head_direction.recorded_target_direction;
 
     let (mut snake_transform, mut grid_position) = snake_head_query.into_inner();
 
     let initial_position = grid_position.0;
-    grid_position.0 += snake_head_direction.direction.to_ivec2();
+    grid_position.0 += snake_head_direction.current_direction.to_ivec2();
 
     // euclid remaining
     grid_position.0 = grid_position.0.rem_euclid(GRID_SIZE);

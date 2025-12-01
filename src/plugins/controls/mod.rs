@@ -16,8 +16,8 @@ pub fn update_direction(
     for key in keyboard_input.get_just_pressed() {
         if let Some(new_direction) = Direction::from_key(key) {
             // prevent reversing direction
-            if new_direction != snake_head_direction.direction.opposite() {
-                snake_head_direction.direction = new_direction;
+            if new_direction != snake_head_direction.current_direction.opposite() {
+                snake_head_direction.recorded_target_direction = new_direction;
             }
         }
     }

@@ -4,13 +4,17 @@ use super::constants::*;
 
 #[derive(Resource)]
 pub struct SnakeHeadDirection {
-    pub direction: Direction,
+    // Target direction for the next tick
+    pub recorded_target_direction: Direction,
+    // Current direction of movement. Stored separately to prevent reversing direction mid-tick
+    pub current_direction: Direction,
 }
 
 impl SnakeHeadDirection {
     pub fn default() -> Self {
         Self {
-            direction: Direction::Right,
+            recorded_target_direction: Direction::Right,
+            current_direction: Direction::Right,
         }
     }
 }
