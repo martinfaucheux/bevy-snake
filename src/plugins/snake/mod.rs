@@ -31,18 +31,13 @@ fn create_snake(
 
     for segment_idx in 1..=INIT_SNAKE_SEGMENT_COUNT {
         let segment_grid_pos = init_grid_pos - IVec2::new(segment_idx, 0);
-        commands.spawn((
-            Mesh2d(shape.clone()),
-            material.clone(),
-            Transform {
-                translation: grid_pos_to_world_pos(segment_grid_pos),
-                ..default()
-            },
-            SnakeSegment {
-                segment_index: segment_idx as usize,
-            },
-            GridPosition(segment_grid_pos),
-        ));
+        spawn_snake_segment(
+            &mut commands,
+            &mut meshes,
+            &mut materials,
+            segment_idx as usize,
+            segment_grid_pos,
+        );
     }
 }
 
@@ -63,6 +58,9 @@ fn move_snake(
     mut propel_snake_message_reader: MessageReader<PropelSnakeMessage>,
     mut collision_detected_message_writer: MessageWriter<CollisionDetectedMessage>,
     mut apple_consumed_message_writer: MessageWriter<AppleConsumedMessage>,
+    mut commands: Commands,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
     if propel_snake_message_reader.is_empty() {
         return;
@@ -113,10 +111,46 @@ fn move_snake(
             }
         });
 
-    // TODO: check for stuff with apples
     for (apple_entity, apple_grid_pos) in apple_query.iter() {
         if apple_grid_pos.0 == grid_position.0 {
             apple_consumed_message_writer.write(AppleConsumedMessage { apple_entity });
+
+            // iterate over the segment query to get the position of the body segment with the highest index
+            let max_segment_idx = snake_segment_query
+                .iter()
+                .map(|(_, _, segment)| segment.segment_index)
+                .max()
+                .unwrap_or(0);
+            if let Some(tail_position) = init_segment_positions.get(&max_segment_idx) {
+                spawn_snake_segment(
+                    &mut commands,
+                    &mut meshes,
+                    &mut materials,
+                    max_segment_idx + 1,
+                    *tail_position,
+                );
+            }
         }
     }
+}
+
+fn spawn_snake_segment(
+    commands: &mut Commands,
+    meshes: &mut ResMut<Assets<Mesh>>,
+    materials: &mut ResMut<Assets<ColorMaterial>>,
+    segment_idx: usize,
+    segment_grid_pos: IVec2,
+) {
+    commands.spawn((
+        Mesh2d(meshes.add(Rectangle::new(CELL_SIZE * 0.8, CELL_SIZE * 0.8))),
+        MeshMaterial2d(materials.add(SNAKE_COLOR)),
+        Transform {
+            translation: grid_pos_to_world_pos(segment_grid_pos),
+            ..default()
+        },
+        SnakeSegment {
+            segment_index: segment_idx as usize,
+        },
+        GridPosition(segment_grid_pos),
+    ));
 }
