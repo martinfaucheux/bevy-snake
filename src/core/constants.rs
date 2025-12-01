@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-pub const TICK_DURATION: f32 = 0.5;
+pub const TICK_DURATION: f32 = 0.2;
 pub const BACKGROUND_COLOR: Color = Color::srgb(0.9, 0.9, 0.9);
 pub const CELL_COLOR: Color = Color::srgb(0.85, 0.85, 0.85);
 
