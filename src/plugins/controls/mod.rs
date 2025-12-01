@@ -27,7 +27,13 @@ pub fn other_key_match(
     keyboard_input: Res<ButtonInput<KeyCode>>,
     mut game_reset_message_writer: MessageWriter<GameResetMessage>,
 ) {
-    if keyboard_input.pressed(KeyCode::KeyR) {
-        game_reset_message_writer.write(GameResetMessage {});
+    for key in keyboard_input.get_just_pressed() {
+        match key {
+            KeyCode::KeyR => {
+                game_reset_message_writer.write(GameResetMessage);
+                println!("Reset Game 1");
+            }
+            _ => {}
+        }
     }
 }

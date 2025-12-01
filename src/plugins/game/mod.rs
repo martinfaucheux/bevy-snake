@@ -13,7 +13,7 @@ impl Plugin for GamePlugin {
                 (TICK_DURATION * 1000.0) as u64,
             ))),
         );
-        app.add_systems(Update, detect_game_over);
+        app.add_systems(Update, (detect_game_over, reset_game));
     }
 }
 
@@ -70,4 +70,38 @@ fn initialize_game(
     }
     game_start_message_writer.write(GameStartMessage);
 }
+
+fn reset_game(
+    mut commands: Commands,
+    mut q: ParamSet<(
+        Query<Entity, With<SnakeHead>>,
+        Query<Entity, With<SnakeSegment>>,
+        Query<Entity, With<Apple>>,
+    )>,
+    mut game_state: ResMut<GameStateResource>,
+    mut snake_head_direction: ResMut<SnakeHeadDirection>,
+    mut game_reset_message_reader: MessageReader<GameResetMessage>,
+    mut game_start_message_writer: MessageWriter<GameStartMessage>,
+) {
+    if game_reset_message_reader.is_empty() {
+        return;
+    }
+    game_reset_message_reader.clear();
+
+    println!("Reset Game 2");
+
+    for entity in q.p0().iter_mut() {
+        commands.entity(entity).despawn();
+    }
+    for entity in q.p1().iter_mut() {
+        commands.entity(entity).despawn();
+    }
+    for entity in q.p2().iter_mut() {
+        commands.entity(entity).despawn();
+    }
+    game_state.0 = GameState::Running;
+    snake_head_direction.current_direction = Direction::Right;
+    snake_head_direction.recorded_target_direction = Direction::Right;
+
+    game_start_message_writer.write(GameStartMessage);
 }
