@@ -1226,6 +1226,7 @@ name = "bevy_simple_game"
 version = "0.1.0"
 dependencies = [
  "bevy",
+ "rand",
 ]
 
 [[package]]
