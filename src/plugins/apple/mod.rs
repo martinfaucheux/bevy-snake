@@ -34,10 +34,25 @@ fn create_apple(
 
 fn on_apple_consumed(
     mut commands: Commands,
+    position_query: Query<&GridPosition>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<ColorMaterial>>,
     mut apple_consumed_message_reader: MessageReader<AppleConsumedMessage>,
 ) {
     for message in apple_consumed_message_reader.read() {
         commands.entity(message.apple_entity).despawn();
         println!("Apple consumed!");
+
+        let apple_position = get_random_unoccupied_grid_pos(&position_query);
+        commands.spawn((
+            Mesh2d(meshes.add(Circle::new(CELL_SIZE * 0.3))),
+            MeshMaterial2d(materials.add(APPLE_COLOR)),
+            Transform {
+                translation: grid_pos_to_world_pos(apple_position),
+                ..default()
+            },
+            Apple,
+            GridPosition(apple_position),
+        ));
     }
 }
