@@ -34,17 +34,10 @@ fn create_apple(
 
 fn on_apple_consumed(
     mut commands: Commands,
-    apple_query: Query<(Entity, &GridPosition), With<Apple>>,
     mut apple_consumed_message_reader: MessageReader<AppleConsumedMessage>,
 ) {
-    if apple_consumed_message_reader.is_empty() {
-        return;
+    for message in apple_consumed_message_reader.read() {
+        commands.entity(message.apple_entity).despawn();
+        println!("Apple consumed!");
     }
-    apple_consumed_message_reader.clear();
-
-    for (apple_entity, _) in apple_query.clone().iter() {
-        commands.entity(apple_entity).despawn();
-    }
-
-    println!("Apple consumed!");
 }

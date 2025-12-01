@@ -6,5 +6,7 @@ pub struct PropelSnakeMessage;
 #[derive(Message, Default)]
 pub struct CollisionDetectedMessage;
 
-#[derive(Message, Default)]
-pub struct AppleConsumedMessage;
+#[derive(Message)]
+pub struct AppleConsumedMessage {
+    pub apple_entity: Entity,
+}

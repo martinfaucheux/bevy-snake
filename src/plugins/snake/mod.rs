@@ -55,7 +55,10 @@ fn move_snake(
         (&mut Transform, &mut GridPosition, &SnakeSegment),
         (With<SnakeSegment>, Without<SnakeHead>),
     >,
-    apple_query: Query<&GridPosition, (With<Apple>, Without<SnakeHead>, Without<SnakeSegment>)>,
+    apple_query: Query<
+        (Entity, &GridPosition),
+        (With<Apple>, Without<SnakeHead>, Without<SnakeSegment>),
+    >,
     mut snake_head_direction: ResMut<SnakeHeadDirection>,
     mut propel_snake_message_reader: MessageReader<PropelSnakeMessage>,
     mut collision_detected_message_writer: MessageWriter<CollisionDetectedMessage>,
@@ -111,9 +114,9 @@ fn move_snake(
         });
 
     // TODO: check for stuff with apples
-    for apple_grid_pos in apple_query.iter() {
+    for (apple_entity, apple_grid_pos) in apple_query.iter() {
         if apple_grid_pos.0 == grid_position.0 {
-            apple_consumed_message_writer.write(AppleConsumedMessage);
+            apple_consumed_message_writer.write(AppleConsumedMessage { apple_entity });
         }
     }
 }
