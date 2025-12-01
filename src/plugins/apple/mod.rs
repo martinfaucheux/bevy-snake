@@ -10,6 +10,27 @@ impl Plugin for ApplePlugin {
     }
 }
 
+/// Helper function to spawn an apple at a given position
+fn spawn_apple(
+    commands: &mut Commands,
+    meshes: &mut ResMut<Assets<Mesh>>,
+    materials: &mut ResMut<Assets<ColorMaterial>>,
+    position: IVec2,
+) {
+    let shape = meshes.add(Circle::new(CELL_SIZE * 0.3));
+    let material = MeshMaterial2d(materials.add(APPLE_COLOR));
+    commands.spawn((
+        Mesh2d(shape),
+        material,
+        Transform {
+            translation: grid_pos_to_world_pos(position),
+            ..default()
+        },
+        Apple,
+        GridPosition(position),
+    ));
+}
+
 fn create_apple(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
@@ -17,19 +38,7 @@ fn create_apple(
     grid_position_query: Query<&GridPosition>,
 ) {
     let apple_position = get_random_unoccupied_grid_pos(&grid_position_query);
-
-    let shape = meshes.add(Circle::new(CELL_SIZE * 0.3));
-    let material = MeshMaterial2d(materials.add(APPLE_COLOR));
-    commands.spawn((
-        Mesh2d(shape),
-        material,
-        Transform {
-            translation: grid_pos_to_world_pos(apple_position),
-            ..default()
-        },
-        Apple,
-        GridPosition(apple_position),
-    ));
+    spawn_apple(&mut commands, &mut meshes, &mut materials, apple_position);
 }
 
 fn on_apple_consumed(
@@ -44,15 +53,6 @@ fn on_apple_consumed(
         println!("Apple consumed!");
 
         let apple_position = get_random_unoccupied_grid_pos(&position_query);
-        commands.spawn((
-            Mesh2d(meshes.add(Circle::new(CELL_SIZE * 0.3))),
-            MeshMaterial2d(materials.add(APPLE_COLOR)),
-            Transform {
-                translation: grid_pos_to_world_pos(apple_position),
-                ..default()
-            },
-            Apple,
-            GridPosition(apple_position),
-        ));
+        spawn_apple(&mut commands, &mut meshes, &mut materials, apple_position);
     }
 }
