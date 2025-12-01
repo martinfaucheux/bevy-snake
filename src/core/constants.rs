@@ -9,8 +9,8 @@ pub const CELL_BORDER_THICKNESS: f32 = 2.0;
 pub const SNAKE_COLOR: Color = Color::srgb(0.3882353, 0.8117647, 0.6431373); // #63cfa4
 pub const APPLE_COLOR: Color = Color::srgb(0.8509804, 0.5294118, 0.3568627); // #d9875b
 
-pub const CELL_SIZE: f32 = 50.0;
-pub const GRID_SIZE: IVec2 = IVec2::new(10, 10);
+pub const CELL_SIZE: f32 = 32.0;
+pub const GRID_SIZE: IVec2 = IVec2::new(20, 20);
 
 pub const INIT_SNAKE_SEGMENT_COUNT: i32 = 4;
 
