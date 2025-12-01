@@ -10,3 +10,6 @@ pub struct SnakeSegment {
 
 #[derive(Component)]
 pub struct GridPosition(pub IVec2);
+
+#[derive(Component)]
+pub struct Apple;

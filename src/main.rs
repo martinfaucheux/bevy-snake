@@ -17,7 +17,13 @@ fn main() {
             }),
             ..default()
         }))
-        .add_plugins((SharedPlugin, ControlPlugin, GamePlugin, SnakePlugin))
+        .add_plugins((
+            SharedPlugin,
+            ControlPlugin,
+            GamePlugin,
+            SnakePlugin,
+            ApplePlugin,
+        ))
         .insert_resource(ClearColor(BACKGROUND_COLOR))
         .add_systems(Startup, setup)
         .run();

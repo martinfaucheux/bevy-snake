@@ -6,7 +6,8 @@ pub const CELL_COLOR: Color = Color::srgb(0.85, 0.85, 0.85);
 
 pub const CELL_BORDER_THICKNESS: f32 = 2.0;
 
-pub const BALL_COLOR: Color = Color::srgb(0.3, 0.3, 0.7);
+pub const SNAKE_COLOR: Color = Color::srgb(0.3882353, 0.8117647, 0.6431373); // #63cfa4
+pub const APPLE_COLOR: Color = Color::srgb(0.8509804, 0.5294118, 0.3568627); // #d9875b
 
 pub const CELL_SIZE: f32 = 50.0;
 pub const GRID_SIZE: IVec2 = IVec2::new(10, 10);

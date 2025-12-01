@@ -19,7 +19,7 @@ fn create_snake(
 ) {
     let init_grid_pos = world_pos_to_grid_pos(Vec3::ZERO);
     let shape = meshes.add(Rectangle::new(CELL_SIZE * 0.8, CELL_SIZE * 0.8));
-    let material = MeshMaterial2d(materials.add(BALL_COLOR));
+    let material = MeshMaterial2d(materials.add(SNAKE_COLOR));
     commands.spawn((
         Mesh2d(shape.clone()),
         material.clone(),
