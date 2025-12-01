@@ -14,12 +14,3 @@ impl SnakeHeadDirection {
         }
     }
 }
-
-#[derive(Resource)]
-pub struct GameTickTimer(pub Timer);
-
-impl GameTickTimer {
-    pub fn default() -> Self {
-        Self(Timer::from_seconds(TICK_DURATION, TimerMode::Repeating))
-    }
-}

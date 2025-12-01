@@ -10,6 +10,5 @@ impl Plugin for SharedPlugin {
         app.add_message::<SegmentMovedMessage>();
         // insert all resources
         app.insert_resource(SnakeHeadDirection::default());
-        app.insert_resource(GameTickTimer::default());
     }
 }
