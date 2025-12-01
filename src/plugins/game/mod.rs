@@ -16,9 +16,14 @@ impl Plugin for GamePlugin {
     }
 }
 
-fn game_time(mut propel_snake_event: MessageWriter<PropelSnakeMessage>) {
-    propel_snake_event.write(PropelSnakeMessage);
-    println!("Game Tick");
+fn game_time(
+    mut propel_snake_event: MessageWriter<PropelSnakeMessage>,
+    game_state: Res<GameStateResource>,
+) {
+    if let GameState::Running = game_state.0 {
+        propel_snake_event.write(PropelSnakeMessage);
+        println!("Game Tick");
+    }
 }
 
 fn setup_grid(mut commands: Commands) {

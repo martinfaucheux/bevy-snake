@@ -10,5 +10,6 @@ impl Plugin for SharedPlugin {
 
         // insert all resources
         app.insert_resource(SnakeHeadDirection::default());
+        app.insert_resource(GameStateResource::default());
     }
 }

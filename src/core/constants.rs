@@ -49,3 +49,10 @@ impl Direction {
         }
     }
 }
+
+#[derive(Debug)]
+pub enum GameState {
+    Running,
+    Paused,
+    End,
+}

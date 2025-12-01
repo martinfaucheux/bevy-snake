@@ -18,3 +18,12 @@ impl SnakeHeadDirection {
         }
     }
 }
+
+#[derive(Resource)]
+pub struct GameStateResource(pub GameState);
+
+impl Default for GameStateResource {
+    fn default() -> Self {
+        Self(GameState::Running)
+    }
+}
