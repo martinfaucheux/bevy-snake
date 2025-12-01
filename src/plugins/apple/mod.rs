@@ -5,7 +5,7 @@ pub struct ApplePlugin;
 
 impl Plugin for ApplePlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, create_apple);
+        app.add_systems(Update, initialize_apple);
         app.add_systems(Update, on_apple_consumed);
     }
 }
@@ -31,12 +31,18 @@ fn spawn_apple(
     ));
 }
 
-fn create_apple(
+fn initialize_apple(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
     grid_position_query: Query<&GridPosition>,
+    mut game_start_message_reader: MessageReader<GameStartMessage>,
 ) {
+    if game_start_message_reader.is_empty() {
+        return;
+    }
+    game_start_message_reader.clear();
+
     let apple_position = get_random_unoccupied_grid_pos(&grid_position_query);
     spawn_apple(&mut commands, &mut meshes, &mut materials, apple_position);
 }

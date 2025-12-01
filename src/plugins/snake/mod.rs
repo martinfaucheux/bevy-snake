@@ -5,7 +5,7 @@ pub struct SnakePlugin;
 
 impl Plugin for SnakePlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, create_snake);
+        app.add_systems(Update, create_snake);
         app.add_systems(Update, move_snake);
     }
 }
@@ -14,7 +14,13 @@ fn create_snake(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
+    mut game_start_message_reader: MessageReader<GameStartMessage>,
 ) {
+    if game_start_message_reader.is_empty() {
+        return;
+    }
+    game_start_message_reader.clear();
+
     let init_grid_pos = world_pos_to_grid_pos(Vec3::ZERO);
     let shape = meshes.add(Rectangle::new(CELL_SIZE * 0.8, CELL_SIZE * 0.8));
     let material = MeshMaterial2d(materials.add(SNAKE_COLOR));

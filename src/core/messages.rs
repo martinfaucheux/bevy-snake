@@ -10,3 +10,9 @@ pub struct CollisionDetectedMessage;
 pub struct AppleConsumedMessage {
     pub apple_entity: Entity,
 }
+
+#[derive(Message, Default)]
+pub struct GameStartMessage;
+
+#[derive(Message, Default)]
+pub struct GameResetMessage;

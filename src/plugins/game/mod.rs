@@ -6,7 +6,7 @@ pub struct GamePlugin;
 
 impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, setup_grid);
+        app.add_systems(Startup, initialize_game);
         app.add_systems(
             FixedUpdate,
             generate_game_ticks.run_if(on_timer(Duration::from_millis(
@@ -39,7 +39,10 @@ fn detect_game_over(
     println!("Game Over!");
 }
 
-fn setup_grid(mut commands: Commands) {
+fn initialize_game(
+    mut commands: Commands,
+    mut game_start_message_writer: MessageWriter<GameStartMessage>,
+) {
     commands.spawn(Camera2d);
 
     // grid cells
@@ -65,4 +68,6 @@ fn setup_grid(mut commands: Commands) {
             ));
         }
     }
+    game_start_message_writer.write(GameStartMessage);
+}
 }
