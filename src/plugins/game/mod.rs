@@ -9,14 +9,15 @@ impl Plugin for GamePlugin {
         app.add_systems(Startup, setup_grid);
         app.add_systems(
             FixedUpdate,
-            game_time.run_if(on_timer(Duration::from_millis(
+            generate_game_ticks.run_if(on_timer(Duration::from_millis(
                 (TICK_DURATION * 1000.0) as u64,
             ))),
         );
+        app.add_systems(Update, detect_game_over);
     }
 }
 
-fn game_time(
+fn generate_game_ticks(
     mut propel_snake_event: MessageWriter<PropelSnakeMessage>,
     game_state: Res<GameStateResource>,
 ) {
@@ -24,6 +25,18 @@ fn game_time(
         propel_snake_event.write(PropelSnakeMessage);
         println!("Game Tick");
     }
+}
+
+fn detect_game_over(
+    game_over_message_reader: MessageReader<CollisionDetectedMessage>,
+    mut game_state: ResMut<GameStateResource>,
+) {
+    if game_state.0 == GameState::GameOver || game_over_message_reader.is_empty() {
+        return;
+    }
+
+    game_state.0 = GameState::GameOver;
+    println!("Game Over!");
 }
 
 fn setup_grid(mut commands: Commands) {

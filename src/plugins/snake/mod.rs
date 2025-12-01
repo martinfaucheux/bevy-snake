@@ -3,8 +3,6 @@ use bevy::prelude::*;
 use std::collections::HashMap;
 pub struct SnakePlugin;
 
-const INIT_SNAKE_SEGMENT_COUNT: i32 = 2;
-
 impl Plugin for SnakePlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, create_snake);
@@ -59,6 +57,7 @@ fn move_snake(
     >,
     mut snake_head_direction: ResMut<SnakeHeadDirection>,
     mut propel_snake_message_reader: MessageReader<PropelSnakeMessage>,
+    mut collision_detected_message_writer: MessageWriter<CollisionDetectedMessage>,
 ) {
     if propel_snake_message_reader.is_empty() {
         return;
@@ -69,7 +68,17 @@ fn move_snake(
     let (mut snake_transform, mut grid_position) = snake_head_query.into_inner();
 
     let initial_position = grid_position.0;
-    grid_position.0 += snake_head_direction.current_direction.to_ivec2();
+    let target_position = initial_position + snake_head_direction.current_direction.to_ivec2();
+
+    if snake_segment_query
+        .iter()
+        .any(|(_, grid_pos, _)| grid_pos.0 == target_position)
+    {
+        collision_detected_message_writer.write(CollisionDetectedMessage);
+        return;
+    }
+
+    grid_position.0 = target_position;
 
     // euclid remaining
     grid_position.0 = grid_position.0.rem_euclid(GRID_SIZE);

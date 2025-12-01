@@ -12,6 +12,8 @@ pub const APPLE_COLOR: Color = Color::srgb(0.8509804, 0.5294118, 0.3568627); // 
 pub const CELL_SIZE: f32 = 50.0;
 pub const GRID_SIZE: IVec2 = IVec2::new(10, 10);
 
+pub const INIT_SNAKE_SEGMENT_COUNT: i32 = 4;
+
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum Direction {
     Up,
@@ -50,9 +52,9 @@ impl Direction {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum GameState {
     Running,
-    Paused,
-    End,
+    // Paused,
+    GameOver,
 }
