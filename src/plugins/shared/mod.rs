@@ -8,6 +8,7 @@ impl Plugin for SharedPlugin {
         // add messages
         app.add_message::<PropelSnakeMessage>();
         app.add_message::<CollisionDetectedMessage>();
+        app.add_message::<AppleConsumedMessage>();
         // insert all resources
         app.insert_resource(SnakeHeadDirection::default());
         app.insert_resource(GameStateResource::default());

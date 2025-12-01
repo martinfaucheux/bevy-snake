@@ -6,6 +6,7 @@ pub struct ApplePlugin;
 impl Plugin for ApplePlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, create_apple);
+        app.add_systems(Update, on_apple_consumed);
     }
 }
 
@@ -29,4 +30,21 @@ fn create_apple(
         Apple,
         GridPosition(apple_position),
     ));
+}
+
+fn on_apple_consumed(
+    mut commands: Commands,
+    apple_query: Query<(Entity, &GridPosition), With<Apple>>,
+    mut apple_consumed_message_reader: MessageReader<AppleConsumedMessage>,
+) {
+    if apple_consumed_message_reader.is_empty() {
+        return;
+    }
+    apple_consumed_message_reader.clear();
+
+    for (apple_entity, _) in apple_query.clone().iter() {
+        commands.entity(apple_entity).despawn();
+    }
+
+    println!("Apple consumed!");
 }
