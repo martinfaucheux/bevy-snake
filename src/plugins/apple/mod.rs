@@ -43,8 +43,10 @@ fn initialize_apple(
     }
     game_start_message_reader.clear();
 
-    let apple_position = get_random_unoccupied_grid_pos(&grid_position_query);
-    spawn_apple(&mut commands, &mut meshes, &mut materials, apple_position);
+    for _ in 0..APPLE_COUNT {
+        let apple_position = get_random_unoccupied_grid_pos(&grid_position_query);
+        spawn_apple(&mut commands, &mut meshes, &mut materials, apple_position);
+    }
 }
 
 fn on_apple_consumed(

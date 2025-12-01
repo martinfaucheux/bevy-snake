@@ -13,6 +13,7 @@ pub const CELL_SIZE: f32 = 32.0;
 pub const GRID_SIZE: IVec2 = IVec2::new(20, 20);
 
 pub const INIT_SNAKE_SEGMENT_COUNT: i32 = 4;
+pub const APPLE_COUNT: i32 = 3;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum Direction {
